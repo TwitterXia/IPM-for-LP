@@ -1,0 +1,49 @@
+function solution=InitialPoint(str)
+global m n p c A b G h
+switch str
+    case 'lst'
+        H=G'*G;
+        L=chol(H,'lower');
+        invHAT=L'\(L\A');
+        invHc=L'\(L\c);
+        invHGTh=L'\(L\(G'*h));
+        S=A*invHAT;
+        L=chol(S,'lower');
+        y=-L'\(L\(A*invHc));
+        vp=L'\(L\(A*invHGTh-b));
+        x=invHGTh-invHAT*vp;
+        vd=invHAT*y+invHc;
+        z=-G*vd;
+        s=h-G*x;
+        ds=max(-1.5*min(s),0);
+        dz=max(-1.5*min(z),0);
+        s=s+ds;
+        z=z+dz;
+        ds=0.5*s'*z/sum(z);
+        dz=0.5*s'*z/sum(s);
+        s=s+ds;
+        z=z+dz;
+    otherwise
+        x=zeros(n,1);
+        s=ones(m,1);
+        y=zeros(p,1);
+        z=ones(m,1);
+end
+pcost=c'*x;
+dcost=-b'*y-h'*z;
+gap=c'*x+b'*y+h'*z;
+mu=(z'*s+2)/(m+1);
+solution.x=x;
+solution.s=s;
+solution.y=y;
+solution.z=z;
+solution.k=1;
+solution.t=1;
+solution.pcost=pcost;
+solution.dcost=dcost;
+solution.gap=gap;
+solution.pres=norm(A*x-b);
+solution.dres=norm(A'*y+G'*z+c);
+solution.mu=mu;
+solution.iter=0;
+end
